@@ -4,6 +4,7 @@
 // The upstream claims iOS 26 support; this does not establish 23G71 support.
 #import "MGContainerAccessCheck.h"
 #import <dlfcn.h>
+#import <stdbool.h>
 #import <stdint.h>
 #import <stdlib.h>
 #import <xpc/xpc.h>
@@ -135,7 +136,11 @@ BOOL MGCheckContainerRoutes(void (^record)(NSString *), MGCheckFileState (^inspe
         return NO;
     }
     MGCheckAPI api = {0};
-#define MG_LOAD(field, symbol) api.field = (__typeof(api.field))dlsym(library, symbol)
+#define MG_LOAD(field, symbol) do { \
+    api.field = (__typeof(api.field))dlsym(library, symbol); \
+    if (!api.field) record([@"接口不可用：" stringByAppendingString: \
+        [NSString stringWithUTF8String:symbol]]); \
+} while (0)
     MG_LOAD(create, "container_query_create");
     MG_LOAD(setClass, "container_query_set_class");
     MG_LOAD(setIdentifiers, "container_query_set_identifiers");

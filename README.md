@@ -4,7 +4,7 @@
 > GitHub 仅测试构建、打包、内嵌权限及文件检测逻辑；真实 iPhone 沙盒权限和 Apple 智能效果未在 CI 验证。
 > IPA 为 ad-hoc 签名，需要使用自己的证书及具备 App Group 的描述文件重新签名后安装。验证版使用独立 Bundle ID。
 > Erosion 上游基准：`76a9f1e490e4c533438ca722666598a11ebe9598`；GestaltX 基准：`36110fd7544ceefdc419e13d337ec515e3ec53dc`。
-> 新查询依据：[Geod-MCM-PoC](https://github.com/0xjohnnydev/Geod-MCM-PoC/tree/1d64e79d326dd8643a7b70dc1899dd3c07f69591) 的公开接口研究。上游称支持 iOS 26，但没有据此认定 iPhone18,2 / 23G71 可用；需要本机 v2 报告。CI 的模拟测试只验证拒绝分支、固定路径检查和清理逻辑。
+> 新查询依据：[Geod-MCM-PoC](https://github.com/0xjohnnydev/Geod-MCM-PoC/tree/1d64e79d326dd8643a7b70dc1899dd3c07f69591) 的公开接口研究。兼容性记录互相矛盾：README 称支持 iOS 26，但 [PR #1](https://github.com/0xjohnnydev/Geod-MCM-PoC/pull/1/files) 记录 26.5.2 未获取 token，[issue #5](https://github.com/0xjohnnydev/Geod-MCM-PoC/issues/5) 报告 26.6 失败。v2 用于核实并排除具体路线，不承诺 iPhone18,2 / 23G71 可用。CI 的模拟测试只验证拒绝分支、固定路径检查和清理逻辑。
 
 <div align="center">
   <br>
