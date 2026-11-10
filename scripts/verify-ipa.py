@@ -20,7 +20,8 @@ for filename in sys.argv[1:]:
     with tempfile.TemporaryDirectory() as temp:
         with zipfile.ZipFile(ipa) as archive:
             assert archive.testzip() is None, 'IPA ZIP checksum failure'
-            archive.extractall(temp)
+        # Preserve Mach-O execute bits and framework symlinks for codesign.
+        run('ditto', '-x', '-k', str(ipa), temp)
         apps = list((Path(temp) / 'Payload').glob('*.app'))
         assert len(apps) == 1, 'Expected one application'
         app = apps[0]
