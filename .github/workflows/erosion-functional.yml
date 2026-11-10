@@ -1,0 +1,48 @@
+name: Inspect release and build Erosion functional IPA
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  functional:
+    runs-on: xcode-27
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect the official v0.7.2 release archive
+        id: official
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          curl --fail --location --retry 3 --output "$RUNNER_TEMP/Erosion-official.ipa" 'https://github.com/Kianuni/Erosion-CN/releases/download/v0.7.2/Erosion_v0.7.2_zh-Hans.ipa'
+          python3 scripts/inspect-release-ipa.py "$RUNNER_TEMP/Erosion-official.ipa" | tee dist/official-archive-report.json
+      - name: Check out fixed upstream functional source
+        uses: actions/checkout@v4
+        with:
+          repository: Kianuni/Erosion-CN
+          ref: 2764867bdbba0f69170b2a0d835179b20116fdc6
+          path: upstream-functional
+      - name: Build standard functional IPA on GitHub
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          xcodebuild -version | tee dist/toolchain.txt
+          bash scripts/build-functional-cloud.sh 2>&1 | tee dist/build.log
+      - name: Verify functional package and entitlements
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/verify-ipa.py dist/Erosion-CN-0.7.2-Compat.ipa | tee dist/package-verification.json
+          shasum -a 256 dist/Erosion-CN-0.7.2-Compat.ipa > dist/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Erosion-CN-0.7.2-Functional-IPA
+          path: dist/
+          retention-days: 30
