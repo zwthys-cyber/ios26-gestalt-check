@@ -26,6 +26,12 @@ jobs:
           xcodebuild -version | tee dist/toolchain.txt
           swiftc Erosion/Tweaks/MobileGestalt/MGPermissionInspection.swift tests/PermissionInspectionTests.swift -o "$RUNNER_TEMP/permission-tests"
           "$RUNNER_TEMP/permission-tests" | tee dist/permission-tests.txt
+      - name: Verify fixed-target container checks with mock APIs
+        shell: bash
+        run: |
+          set -euo pipefail
+          clang -fobjc-arc -fblocks -framework Foundation tests/ContainerAccessCheckTests.m -o "$RUNNER_TEMP/container-tests"
+          "$RUNNER_TEMP/container-tests" | tee dist/container-tests.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:

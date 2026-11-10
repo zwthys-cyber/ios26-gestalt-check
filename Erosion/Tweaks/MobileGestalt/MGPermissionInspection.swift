@@ -7,14 +7,15 @@ struct MGPermissionInspection {
     let writable: Bool
     let validPlist: Bool
     let detail: String
+    var writeOpenDenied: Bool = false
     var passed: Bool { readable && writable && validPlist }
 }
 
 // Checks actual file descriptors. Never writes, truncates, renames or deletes
 // the target, even when an O_RDWR descriptor is successfully obtained.
 func inspectMGPermissions(at url: URL) -> MGPermissionInspection {
-    func result(_ readable: Bool, _ writable: Bool, _ valid: Bool, _ detail: String) -> MGPermissionInspection {
-        MGPermissionInspection(readable: readable, writable: writable, validPlist: valid, detail: detail)
+    func result(_ readable: Bool, _ writable: Bool, _ valid: Bool, _ detail: String, denied: Bool = false) -> MGPermissionInspection {
+        MGPermissionInspection(readable: readable, writable: writable, validPlist: valid, detail: detail, writeOpenDenied: denied)
     }
     let reader = open(url.path, O_RDONLY | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK)
     guard reader >= 0 else {
@@ -49,7 +50,7 @@ func inspectMGPermissions(at url: URL) -> MGPermissionInspection {
     let writer = open(url.path, O_RDWR | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK)
     guard writer >= 0 else {
         let code = errno
-        return result(true, false, true, "读取成功；读写打开被拒绝：errno=\(code) (\(String(cString: strerror(code))))")
+        return result(true, false, true, "读取成功；读写打开被拒绝：errno=\(code) (\(String(cString: strerror(code))))", denied: code == EPERM || code == EACCES)
     }
     defer { close(writer) }
     var current = stat()

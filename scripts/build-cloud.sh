@@ -21,7 +21,7 @@ case "${1:?Choose Erosion-Check or GestaltX}" in
       codesign -f -s - "$nested"
     done < <(find "$app" -depth \( -name '*.framework' -o -name '*.dylib' \) -print0)
     codesign -f -s - --entitlements Erosion/Erosion.entitlements "$app"
-    (cd "$stage" && zip -qry "$root/dist/Erosion-26.6-Check.ipa" Payload)
+    (cd "$stage" && zip -qry "$root/dist/Erosion-26.6-Check-v2.ipa" Payload)
     git rev-parse HEAD > dist/source-commit.txt
     ;;
   GestaltX)

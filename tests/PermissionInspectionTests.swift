@@ -14,7 +14,7 @@ struct PermissionInspectionTests {
         ], format: .binary, options: 0)
         try data.write(to: file)
         let valid = inspectMGPermissions(at: file)
-        precondition(valid.passed, valid.detail)
+        precondition(valid.passed && !valid.writeOpenDenied, valid.detail)
         let afterValid = try Data(contentsOf: file)
         precondition(afterValid == data, "Inspection mutated valid file")
         print("PASS: valid fixture opens O_RDWR and bytes remain unchanged")
@@ -22,7 +22,7 @@ struct PermissionInspectionTests {
         precondition(chmod(file.path, 0o444) == 0)
         if geteuid() != 0 {
             let readOnly = inspectMGPermissions(at: file)
-            precondition(readOnly.readable && readOnly.validPlist && !readOnly.writable && !readOnly.passed)
+            precondition(readOnly.readable && readOnly.validPlist && !readOnly.writable && !readOnly.passed && readOnly.writeOpenDenied)
             print("PASS: read-only fixture cannot be reported writable")
         } else { throw NSError(domain: "TestsMustNotRunAsRoot", code: 1) }
         precondition(chmod(file.path, 0o600) == 0)
@@ -41,7 +41,7 @@ struct PermissionInspectionTests {
 
         try Data("not a plist".utf8).write(to: file)
         let invalid = inspectMGPermissions(at: file)
-        precondition(invalid.readable && !invalid.validPlist && !invalid.passed)
+        precondition(invalid.readable && !invalid.validPlist && !invalid.passed && !invalid.writeOpenDenied)
         let unchanged = try Data(contentsOf: file)
         precondition(unchanged == Data("not a plist".utf8))
         print("PASS: malformed fixture rejected and unchanged")

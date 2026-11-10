@@ -1,9 +1,10 @@
 > 此仓库用于在 GitHub Actions 验证和编译 Erosion 检测版、GestaltX 原版。
 > **不是已验证的 iOS 26.6 解锁版本。** 保留上游功能版本限制。
-> Erosion 新增「功能修改 → 本机权限验证」，可在 iOS 26.6 检查重签后 App Group、目标文件实际读取和 O_RDWR 打开权限，检测不写系统配置。
+> Erosion「功能修改 → 本机权限验证」现为 v2：检测 geod class 12 和 MobileGestalt class 13 两条不同于 worse_query 的临时授权路线。检测固定目标的读取、结构、O_RDWR 打开和授权释放，不写系统配置，也不保留已获得的权限。
 > GitHub 仅测试构建、打包、内嵌权限及文件检测逻辑；真实 iPhone 沙盒权限和 Apple 智能效果未在 CI 验证。
 > IPA 为 ad-hoc 签名，需要使用自己的证书及具备 App Group 的描述文件重新签名后安装。验证版使用独立 Bundle ID。
 > Erosion 上游基准：`76a9f1e490e4c533438ca722666598a11ebe9598`；GestaltX 基准：`36110fd7544ceefdc419e13d337ec515e3ec53dc`。
+> 新查询依据：[Geod-MCM-PoC](https://github.com/0xjohnnydev/Geod-MCM-PoC/tree/1d64e79d326dd8643a7b70dc1899dd3c07f69591) 的公开接口研究。上游称支持 iOS 26，但没有据此认定 iPhone18,2 / 23G71 可用；需要本机 v2 报告。CI 的模拟测试只验证拒绝分支、固定路径检查和清理逻辑。
 
 <div align="center">
   <br>

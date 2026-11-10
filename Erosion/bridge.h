@@ -12,6 +12,7 @@
 #import "Exploits/worse_query.h"
 #import "Exploits/pathleak.h"
 #import "Tweaks/MobileGestalt/MGImageReader.h"
+#import "Tweaks/MobileGestalt/MGContainerAccessCheck.h"
 #import <Foundation/Foundation.h>
 #import <CoreFoundation/CoreFoundation.h>
 
