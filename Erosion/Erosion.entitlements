@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.jbdotparty.Erosion.WQ</string>
+		<string>group.com.zwthys.ErosionCheck</string>
 	</array>
 </dict>
 </plist>

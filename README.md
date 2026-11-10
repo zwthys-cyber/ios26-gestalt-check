@@ -1,3 +1,10 @@
+> 此仓库用于在 GitHub Actions 验证和编译 Erosion 检测版、GestaltX 原版。
+> **不是已验证的 iOS 26.6 解锁版本。** 保留上游功能版本限制。
+> Erosion 新增「功能修改 → 本机权限验证」，可在 iOS 26.6 检查重签后 App Group、目标文件实际读取和 O_RDWR 打开权限，检测不写系统配置。
+> GitHub 仅测试构建、打包、内嵌权限及文件检测逻辑；真实 iPhone 沙盒权限和 Apple 智能效果未在 CI 验证。
+> IPA 为 ad-hoc 签名，需要使用自己的证书及具备 App Group 的描述文件重新签名后安装。验证版使用独立 Bundle ID。
+> Erosion 上游基准：`76a9f1e490e4c533438ca722666598a11ebe9598`；GestaltX 基准：`36110fd7544ceefdc419e13d337ec515e3ec53dc`。
+
 <div align="center">
   <br>
   <a href="https://github.com/Kianuni/Erosion-CN/releases/latest"><img src="./PreviewIcon.png" alt="App Icon" width="150"></a>

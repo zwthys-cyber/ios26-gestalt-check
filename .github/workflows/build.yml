@@ -1,22 +1,64 @@
-name: Build IPA
+name: Verify and build iOS packages
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build:
+  verify:
     runs-on: macos-latest
+    timeout-minutes: 10
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Build Erosion IPA
+      - uses: actions/checkout@v4
+      - name: Verify non-mutating file permission inspection
+        shell: bash
         run: |
-          chmod +x ipabuild.sh
-          ./ipabuild.sh
-
-      - name: Upload IPA Artifact
-        uses: actions/upload-artifact@v4
+          set -euo pipefail
+          mkdir -p dist
+          xcodebuild -version | tee dist/toolchain.txt
+          swiftc Erosion/Tweaks/MobileGestalt/MGPermissionInspection.swift tests/PermissionInspectionTests.swift -o "$RUNNER_TEMP/permission-tests"
+          "$RUNNER_TEMP/permission-tests" | tee dist/permission-tests.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: Erosion-CN-IPA
-          path: Erosion_*.ipa
+          name: Verification-results
+          path: dist/
+  build:
+    needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [Erosion-Check, GestaltX]
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build package on GitHub macOS runner
+        env:
+          BUILD_APP: ${{ matrix.app }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          xcodebuild -version | tee dist/toolchain.txt
+          bash scripts/build-cloud.sh "$BUILD_APP" 2>&1 | tee dist/build.log
+      - name: Verify packaged binary and App Group entitlements
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/verify-ipa.py dist/*.ipa | tee dist/package-verification.json
+          shasum -a 256 dist/*.ipa > dist/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.app }}-IPA
+          path: dist/
+          retention-days: 30

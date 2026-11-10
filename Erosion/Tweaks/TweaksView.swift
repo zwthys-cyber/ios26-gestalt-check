@@ -13,6 +13,11 @@ struct TweaksView: View {
         NavigationStack {
             List {
                 Section {
+                    NavigationLink("本机权限验证（支持在 iOS 26.6 运行）", destination: MGAccessCheckView())
+                } header: {
+                    HeaderLabel("兼容性验证", symbol: "checkmark.shield")
+                }
+                Section {
                     NavigationLink("自定义锁屏壁纸", destination: PosterBoardView())
                     NavigationLink("拨号键盘美化", destination: KeypadView())
                 } header: {
