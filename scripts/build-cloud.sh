@@ -11,7 +11,8 @@ case "${1:?Choose Erosion-Check or GestaltX}" in
       CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
       DEVELOPMENT_TEAM="" SDKROOT=iphoneos \
       PRODUCT_BUNDLE_IDENTIFIER=com.zwthys.ErosionCheck \
-      'INFOPLIST_KEY_CFBundleDisplayName=Erosion 验证' build
+      'INFOPLIST_KEY_CFBundleDisplayName=Erosion 检测 v3' \
+      'SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) MG_DIAGNOSTIC_ONLY' build
     stage="$(mktemp -d)"
     trap 'rm -rf "$stage"' EXIT
     mkdir -p "$stage/Payload"
@@ -21,7 +22,7 @@ case "${1:?Choose Erosion-Check or GestaltX}" in
       codesign -f -s - "$nested"
     done < <(find "$app" -depth \( -name '*.framework' -o -name '*.dylib' \) -print0)
     codesign -f -s - --entitlements Erosion/Erosion.entitlements "$app"
-    (cd "$stage" && zip -qry "$root/dist/Erosion-26.6-Check-v2.ipa" Payload)
+    (cd "$stage" && zip -qry "$root/dist/Erosion-PostOTA-Check-v3.ipa" Payload)
     git rev-parse HEAD > dist/source-commit.txt
     ;;
   GestaltX)

@@ -47,6 +47,11 @@ struct ErosionApp: App {
     
     var body: some Scene {
         WindowGroup {
+            #if MG_DIAGNOSTIC_ONLY
+            NavigationStack {
+                MGAccessCheckView()
+            }
+            #else
             TabView {
                 ContentView()
                     .tabItem {
@@ -99,6 +104,7 @@ struct ErosionApp: App {
                         .ignoresSafeArea()
                 }
             }
+            #endif
         }
     }
 }

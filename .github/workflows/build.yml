@@ -32,6 +32,12 @@ jobs:
           set -euo pipefail
           clang -fobjc-arc -fblocks -framework Foundation tests/ContainerAccessCheckTests.m -o "$RUNNER_TEMP/container-tests"
           "$RUNNER_TEMP/container-tests" | tee dist/container-tests.txt
+      - name: Verify post-OTA query decision and cleanup flow
+        shell: bash
+        run: |
+          set -euo pipefail
+          swiftc Erosion/Tweaks/MobileGestalt/MGPermissionInspection.swift Erosion/Tweaks/MobileGestalt/MGWorseQueryCheck.swift tests/WorseQueryCheckTests.swift -o "$RUNNER_TEMP/worse-query-check-tests"
+          "$RUNNER_TEMP/worse-query-check-tests" | tee dist/worse-query-check-tests.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
